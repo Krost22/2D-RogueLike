@@ -46,7 +46,7 @@ public class EnemySpawner : MonoBehaviour
         GameObject warningInstance = null;
         if (spawnWarningPrefab != null)
         {
-            warningInstance = Instantiate(spawnWarningPrefab, position, Quaternion.identity);
+            warningInstance = PoolManager.Instance.Spawn(spawnWarningPrefab, position, Quaternion.identity);
         }
 
         // 2. Wait for grace period
@@ -55,11 +55,11 @@ public class EnemySpawner : MonoBehaviour
         // 3. Remove Warning
         if (warningInstance != null)
         {
-            Destroy(warningInstance);
+            PoolManager.Instance.Despawn(warningInstance);
         }
 
         // 4. Spawn Enemy
-        GameObject enemyInstance = Instantiate(enemyPrefab, position, Quaternion.identity);
+        GameObject enemyInstance = PoolManager.Instance.Spawn(enemyPrefab, position, Quaternion.identity);
         
         // 5. Notify system
         OnEnemySpawned?.Invoke(enemyInstance);

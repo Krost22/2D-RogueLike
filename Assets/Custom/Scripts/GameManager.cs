@@ -5,20 +5,21 @@ public class GameManager : MonoBehaviour
 {
     [Header("Feedbacks")]
     public MMF_Player playerHitFeedback;
+    public MMF_Player gameOverFeedback;
 
     // Se llama cuando el objeto se activa (ej. al empezar el juego o activarse en la jerarquía)
     private void OnEnable()
     {
         // Nos suscribimos al evento estático del EnemyController.
-        // Cuando 'OnPlayerHit' ocurra, se ejecutará 'HandlePlayerHit'.
         EnemyController.OnPlayerHit += HandlePlayerHit;
+        PlayerController.OnPlayerDeath += HandlePlayerDeath;
     }
 
     // Se llama cuando el objeto se desactiva o destruye.
-    // ES CRÍTICO desuscribirse para evitar errores de memoria o llamadas a objetos destruidos.
     private void OnDisable()
     {
         EnemyController.OnPlayerHit -= HandlePlayerHit;
+        PlayerController.OnPlayerDeath -= HandlePlayerDeath;
     }
 
     // Esta es la función que responde al evento.
@@ -30,6 +31,16 @@ public class GameManager : MonoBehaviour
         if (playerHitFeedback != null)
         {
             playerHitFeedback.PlayFeedbacks();
+        }
+    }
+
+    private void HandlePlayerDeath()
+    {
+        Debug.Log("GAME OVER! (Mensaje desde GameManager)");
+
+        if (gameOverFeedback != null)
+        {
+            gameOverFeedback.PlayFeedbacks();
         }
     }
 }
