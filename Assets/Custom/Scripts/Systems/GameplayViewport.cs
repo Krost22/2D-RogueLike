@@ -12,7 +12,13 @@ public class GameplayViewport : MonoBehaviour
     [Range(0.1f, 1.0f)]
     public float viewportScale = 0.9f;
 
-    [Header("Visuals")]
+    [Header("Visual Control")]
+    [Tooltip("Automatically position and scale the background elements.")]
+    public bool autoUpdateBackgrounds = true;
+    [Tooltip("Automatically position and scale the border elements.")]
+    public bool autoUpdateBorders = true;
+
+    [Header("Visuals Resources")]
     public Sprite outerBackground;
     public Color outerBackgroundColor = Color.black;
     [Space]
@@ -29,7 +35,7 @@ public class GameplayViewport : MonoBehaviour
     // Visual Objects
     private GameObject outerBgObj;
     private GameObject innerBgObj;
-    private GameObject[] borders = new GameObject[4]; // Top, Bottom, Left, Right
+    [SerializeField] private GameObject[] borders = new GameObject[4]; // Top, Bottom, Left, Right
 
     void OnEnable()
     {
@@ -102,8 +108,12 @@ public class GameplayViewport : MonoBehaviour
 
         // 3. Borders (Attached to Main Camera)
         string[] borderNames = { "BorderTop", "BorderBottom", "BorderLeft", "BorderRight" };
+        if (borders == null || borders.Length != 4) borders = new GameObject[4];
+
         for (int i = 0; i < 4; i++)
         {
+            if (borders[i] != null) continue;
+
             Transform b = transform.Find(borderNames[i]);
             if (b != null) borders[i] = b.gameObject;
             
@@ -152,7 +162,7 @@ public class GameplayViewport : MonoBehaviour
         // --- 2. Visuals Update ---
         
         // Update Outer Background Scale to fill screen
-        if (backgroundCam != null && outerBgObj != null)
+        if (autoUpdateBackgrounds && backgroundCam != null && outerBgObj != null)
         {
             backgroundCam.backgroundColor = outerBackgroundColor;
             var sr = outerBgObj.GetComponent<SpriteRenderer>();
@@ -182,7 +192,7 @@ public class GameplayViewport : MonoBehaviour
         float worldWidth = worldHeight * camAspect;
 
         // Inner Background
-        if (innerBgObj != null)
+        if (autoUpdateBackgrounds && innerBgObj != null)
         {
             var sr = innerBgObj.GetComponent<SpriteRenderer>();
             sr.sprite = innerBackground;
@@ -197,14 +207,17 @@ public class GameplayViewport : MonoBehaviour
         }
 
         // Borders
-        // Top
-        UpdateBorder(borders[0], new Vector3(0, camOrthoSize + borderWidth/2f, 10), new Vector3(worldWidth + borderWidth*2, borderWidth, 1));
-        // Bottom
-        UpdateBorder(borders[1], new Vector3(0, -camOrthoSize - borderWidth/2f, 10), new Vector3(worldWidth + borderWidth*2, borderWidth, 1));
-        // Left
-        UpdateBorder(borders[2], new Vector3(-worldWidth/2f - borderWidth/2f, 0, 10), new Vector3(borderWidth, worldHeight, 1));
-        // Right
-        UpdateBorder(borders[3], new Vector3(worldWidth/2f + borderWidth/2f, 0, 10), new Vector3(borderWidth, worldHeight, 1));
+        if (autoUpdateBorders)
+        {
+            // Top
+            UpdateBorder(borders[0], new Vector3(0, camOrthoSize + borderWidth/2f, 10), new Vector3(worldWidth + borderWidth*2, borderWidth, 1));
+            // Bottom
+            UpdateBorder(borders[1], new Vector3(0, -camOrthoSize - borderWidth/2f, 10), new Vector3(worldWidth + borderWidth*2, borderWidth, 1));
+            // Left
+            UpdateBorder(borders[2], new Vector3(-worldWidth/2f - borderWidth/2f, 0, 10), new Vector3(borderWidth, worldHeight, 1));
+            // Right
+            UpdateBorder(borders[3], new Vector3(worldWidth/2f + borderWidth/2f, 0, 10), new Vector3(borderWidth, worldHeight, 1));
+        }
     }
 
     void UpdateBorder(GameObject obj, Vector3 localPos, Vector3 scale)
