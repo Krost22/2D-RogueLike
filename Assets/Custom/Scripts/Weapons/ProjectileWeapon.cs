@@ -35,7 +35,13 @@ public class ProjectileWeapon : WeaponBehavior
             // Use current rotation for direction
             Vector3 dir = transform.right; 
             
-            pp.Initialize(dir, data.damage, data.speed, data.isExplosive, data.areaOfEffect);
+            float damage = data.damage;
+            if (player != null)
+            {
+                damage *= player.damageMultiplier;
+            }
+
+            pp.Initialize(dir, damage, data.speed, data.isExplosive, data.areaOfEffect);
         }
     }
 }

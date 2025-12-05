@@ -1,18 +1,34 @@
 using UnityEngine;
 using MoreMountains.Feedbacks;
+using MoreMountains.Tools;
 
 public class GameManager : MonoBehaviour
 {
     [Header("Feedbacks")]
     public MMF_Player playerHitFeedback;
     public MMF_Player gameOverFeedback;
+    public MMProgressBar lifeBar;
+
+    private PlayerController playerController;
 
     // Se llama cuando el objeto se activa (ej. al empezar el juego o activarse en la jerarquía)
     private void OnEnable()
     {
+        playerController = FindFirstObjectByType<PlayerController>();
+
         // Nos suscribimos al evento estático del EnemyController.
         EnemyController.OnPlayerHit += HandlePlayerHit;
         PlayerController.OnPlayerDeath += HandlePlayerDeath;
+
+        if (playerController != null)
+        {
+            playerController.OnHealthChanged += HandleHealthChanged;
+            // Inicializar barra de vida
+            if (lifeBar != null)
+            {
+                lifeBar.UpdateBar(playerController.currentHealth=playerController.maxHealth, 0f, playerController.maxHealth);
+            }
+        }
     }
 
     // Se llama cuando el objeto se desactiva o destruye.
@@ -20,15 +36,26 @@ public class GameManager : MonoBehaviour
     {
         EnemyController.OnPlayerHit -= HandlePlayerHit;
         PlayerController.OnPlayerDeath -= HandlePlayerDeath;
+
+        if (playerController != null)
+        {
+            playerController.OnHealthChanged -= HandleHealthChanged;
+        }
+    }
+
+    private void HandleHealthChanged(int current, int max)
+    {
+        if (lifeBar != null)
+        {
+            lifeBar.UpdateBar(current, 0f, max);
+        }
     }
 
     // Esta es la función que responde al evento.
     private void HandlePlayerHit()
     {
-        Debug.Log("¡El jugador ha sido golpeado! (Mensaje desde GameManager)");
-        
         // Reproducir feedback si está asignado
-        if (playerHitFeedback != null)
+        if (playerHitFeedback != null && playerController.isInvulnerable == false)
         {
             playerHitFeedback.PlayFeedbacks();
         }

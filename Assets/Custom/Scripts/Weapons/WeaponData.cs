@@ -5,6 +5,7 @@ public class WeaponData : ScriptableObject
 {
     public string weaponName;
     [TextArea] public string description;
+    public Sprite icon; // Visual representation
     public GameObject prefab; // Projectile prefab or Effect prefab
     public float damage = 10f;
     public float fireRate = 1f; // Shots per second

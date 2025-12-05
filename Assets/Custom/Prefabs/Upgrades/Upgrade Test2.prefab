@@ -47,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UpgradePickup
   weaponUpgrade: {fileID: 11400000, guid: ff5110d21ee67b840bdd5bc1457b8cac, type: 2}
+  statUpgrade: {fileID: 0}
+  iconRenderer: {fileID: 7423212382328338118}
 --- !u!212 &7423212382328338118
 SpriteRenderer:
   m_ObjectHideFlags: 0

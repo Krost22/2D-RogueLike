@@ -166,7 +166,8 @@ public class HordeManager : MonoBehaviour
     }
 
     private List<GameObject> activePickups = new List<GameObject>();
-    public List<WeaponData> availableUpgrades; // Pool of upgrades to choose from
+    public List<WeaponData> availableUpgrades; // Pool of weapon upgrades
+    public List<StatUpgradeData> availableStatUpgrades; // Pool of stat upgrades
     public GameObject upgradePickupPrefab; // Prefab with UpgradePickup component
     public Transform[] upgradeSpawnPoints; // Where to spawn them
 
@@ -177,34 +178,57 @@ public class HordeManager : MonoBehaviour
         
         SpawnUpgrades();
     }
-
     private void SpawnUpgrades()
     {
         // Clear old pickups if any
         ClearPickups();
 
-        if (upgradePickupPrefab == null || availableUpgrades.Count == 0)
+        if (upgradePickupPrefab == null)
         {
-            Debug.LogWarning("Cannot spawn upgrades: Missing prefab or upgrades list.");
+            Debug.LogWarning("Cannot spawn upgrades: Missing prefab.");
             StartNextWave(); // Fallback
             return;
         }
 
+        // Combine lists for selection
+        int totalOptions = availableUpgrades.Count + availableStatUpgrades.Count;
+        if (totalOptions == 0)
+        {
+             Debug.LogWarning("No upgrades available.");
+             StartNextWave();
+             return;
+        }
+
         // Pick 2 or 3 random upgrades
-        int count = Mathf.Min(3, availableUpgrades.Count);
-        // Shuffle list or pick random indices (simple approach for now)
+        int count = Mathf.Min(3, totalOptions);
         
+        // Create a list of indices to pick from [0...totalOptions-1]
+        List<int> indices = new List<int>();
+        for(int k=0; k<totalOptions; k++) indices.Add(k);
+
         for (int i = 0; i < count; i++)
         {
             if (i >= upgradeSpawnPoints.Length) break;
+            if (indices.Count == 0) break;
+
+            int randIndex = UnityEngine.Random.Range(0, indices.Count);
+            int selection = indices[randIndex];
+            indices.RemoveAt(randIndex);
 
             Vector3 pos = upgradeSpawnPoints[i].position;
             GameObject pickupObj = Instantiate(upgradePickupPrefab, pos, Quaternion.identity);
             UpgradePickup pickup = pickupObj.GetComponent<UpgradePickup>();
             
-            // Assign random upgrade
-            // Note: In a real game, ensure unique picks
-            pickup.weaponUpgrade = availableUpgrades[UnityEngine.Random.Range(0, availableUpgrades.Count)];
+            if (selection < availableUpgrades.Count)
+            {
+                pickup.weaponUpgrade = availableUpgrades[selection];
+                pickup.statUpgrade = null;
+            }
+            else
+            {
+                pickup.statUpgrade = availableStatUpgrades[selection - availableUpgrades.Count];
+                pickup.weaponUpgrade = null;
+            }
             
             activePickups.Add(pickupObj);
         }
@@ -214,7 +238,11 @@ public class HordeManager : MonoBehaviour
     {
         if (currentState != HordeState.CalmPhase) return;
 
-        Debug.Log($"Upgrade picked: {picked.weaponUpgrade.weaponName}");
+        string name = "Unknown";
+        if (picked.weaponUpgrade != null) name = picked.weaponUpgrade.weaponName;
+        else if (picked.statUpgrade != null) name = picked.statUpgrade.upgradeName;
+
+        Debug.Log($"Upgrade picked: {name}");
         
         ClearPickups();
         StartNextWave();

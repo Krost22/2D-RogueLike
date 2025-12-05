@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
@@ -11,11 +12,17 @@ public class PlayerController : MonoBehaviour
     public float rotationSpeed = 10f; // Velocidad de rotación
 
     [Header("Health Settings")]
-    public int maxHealth = 100;
+    public int maxHealth = 3;
     public int currentHealth;
+
+    [Header("Invulnerability Settings")]
+    public float invulnerabilityDuration = 2f;
+    public bool isInvulnerable = false;
 
     [Header("Combat Settings")]
     public WeaponController weaponController;
+    public float damageMultiplier = 1f;
+    public float fireRateMultiplier = 1f;
 
     private Rigidbody2D rb;
     private Vector2 input;
@@ -86,11 +93,18 @@ public class PlayerController : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        if (isInvulnerable) return;
+
         currentHealth -= amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         
         Debug.Log($"Player took {amount} damage. Current Health: {currentHealth}/{maxHealth}");
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
+        if (currentHealth > 0)
+        {
+            StartCoroutine(InvulnerabilityCoroutine());
+        }
 
         if (currentHealth <= 0)
         {
@@ -107,6 +121,15 @@ public class PlayerController : MonoBehaviour
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
+    public void IncreaseMaxHealth(int amount)
+    {
+        maxHealth += amount;
+        currentHealth += amount; // Optional: heal the amount increased or just increase capacity? Usually increases current health too.
+        
+        Debug.Log($"Player max health increased by {amount}. New Max Health: {maxHealth}");
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
     private void Die()
     {
         Debug.Log("Player Died!");
@@ -119,5 +142,44 @@ public class PlayerController : MonoBehaviour
     {
         Debug.Log($"Applying upgrade: {upgradeName}");
         // Implementar lógica de mejoras
+    }
+
+    public void ApplyStatUpgrade(StatUpgradeData data)
+    {
+        if (data == null) return;
+
+        Debug.Log($"Applying Stat Upgrade: {data.upgradeName}");
+
+        if (data.healthBonus > 0)
+        {
+            IncreaseMaxHealth(data.healthBonus);
+        }
+
+        if (data.speedBonus != 0)
+        {
+            moveSpeed += data.speedBonus;
+            Debug.Log($"Speed increased by {data.speedBonus}. New Speed: {moveSpeed}");
+        }
+
+        if (data.damageMultiplierBonus != 0)
+        {
+            damageMultiplier += data.damageMultiplierBonus;
+            Debug.Log($"Damage Multiplier increased by {data.damageMultiplierBonus}. New Multiplier: {damageMultiplier}");
+        }
+
+        if (data.fireRateMultiplierBonus != 0)
+        {
+            fireRateMultiplier += data.fireRateMultiplierBonus;
+            Debug.Log($"Fire Rate Multiplier increased by {data.fireRateMultiplierBonus}. New Multiplier: {fireRateMultiplier}");
+        }
+    }
+
+    private IEnumerator InvulnerabilityCoroutine()
+    {
+        isInvulnerable = true;
+        Debug.Log("Player is now invulnerable.");
+        yield return new WaitForSeconds(invulnerabilityDuration);
+        isInvulnerable = false;
+        Debug.Log("Player is no longer invulnerable.");
     }
 }

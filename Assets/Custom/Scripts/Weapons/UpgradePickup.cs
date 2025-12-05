@@ -3,7 +3,23 @@ using UnityEngine;
 public class UpgradePickup : MonoBehaviour
 {
     public WeaponData weaponUpgrade;
-    // Could add other types of upgrades here (e.g. Health, Speed)
+    public StatUpgradeData statUpgrade;
+    public SpriteRenderer iconRenderer;
+
+    private void Start()
+    {
+        if (iconRenderer != null)
+        {
+            if (weaponUpgrade != null)
+            {
+                iconRenderer.sprite = weaponUpgrade.icon;
+            }
+            else if (statUpgrade != null)
+            {
+                iconRenderer.sprite = statUpgrade.icon;
+            }
+        }
+    }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -16,6 +32,10 @@ public class UpgradePickup : MonoBehaviour
                 if (weaponUpgrade != null)
                 {
                     player.weaponController.AddWeapon(weaponUpgrade);
+                }
+                else if (statUpgrade != null)
+                {
+                    player.ApplyStatUpgrade(statUpgrade);
                 }
 
                 // Notify HordeManager

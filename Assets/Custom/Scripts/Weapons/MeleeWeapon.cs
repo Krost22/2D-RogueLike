@@ -18,7 +18,12 @@ public class MeleeWeapon : WeaponBehavior
         if (pp != null)
         {
             // Melee "projectile" that doesn't move much but has lifetime
-            pp.Initialize(Vector3.zero, data.damage, 0f, false, 0f);
+            float damage = data.damage;
+            if (player != null)
+            {
+                damage *= player.damageMultiplier;
+            }
+            pp.Initialize(Vector3.zero, damage, 0f, false, 0f);
         }
     }
 }

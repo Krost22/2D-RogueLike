@@ -14,10 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
   weaponName: Normal gun
   description: 
+  icon: {fileID: -1001581268832274596, guid: fe42c8b526e77e54ab91d0590272d9e8, type: 3}
   prefab: {fileID: 4393170669358528555, guid: 8924f90e9cd7ad34cae3f5f12c47753d, type: 3}
-  damage: 10
+  damage: 1
   fireRate: 1
-  speed: 10
+  speed: 15
   isMelee: 0
   isExplosive: 0
   areaOfEffect: 0

@@ -10,14 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f67ad98a3c0514f48bfbc55395310a11, type: 3}
-  m_Name: Rocket Launcher
+  m_Name: Sword Slash
   m_EditorClassIdentifier: Assembly-CSharp::WeaponData
-  weaponName: Rocket Launcher
+  weaponName: Sword Slash
   description: 
+  icon: {fileID: -8308906585651362545, guid: 3da05e9f66c9f254c8875335e7e9179e, type: 3}
   prefab: {fileID: 4393170669358528555, guid: 8924f90e9cd7ad34cae3f5f12c47753d, type: 3}
-  damage: 10
+  damage: 1
   fireRate: 1
   speed: 10
-  isMelee: 0
-  isExplosive: 1
-  areaOfEffect: 1
+  isMelee: 1
+  isExplosive: 0
+  areaOfEffect: 0
+  projectileCount: 1
+  timeBetweenProjectiles: 0.1
