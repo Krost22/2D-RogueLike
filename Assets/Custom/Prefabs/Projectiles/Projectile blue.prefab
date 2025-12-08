@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edd4fbd48e9a9cc41a09634c0e3c1b19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerProjectile
+  wallTag: Wall
 --- !u!212 &6409248481439499356
 SpriteRenderer:
   m_ObjectHideFlags: 0

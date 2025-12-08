@@ -7,7 +7,20 @@ public class GameManager : MonoBehaviour
     [Header("Feedbacks")]
     public MMF_Player playerHitFeedback;
     public MMF_Player gameOverFeedback;
+    public MMF_Player projectilePlayerWallFeedback;
     public MMProgressBar lifeBar;
+
+    public static GameManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
 
     private PlayerController playerController;
 
@@ -68,6 +81,15 @@ public class GameManager : MonoBehaviour
         if (gameOverFeedback != null)
         {
             gameOverFeedback.PlayFeedbacks();
+        }
+    }
+
+    public void HandlePlayerProjectileWallHit(Vector3 position)
+    {
+        if (projectilePlayerWallFeedback != null)
+        {
+            projectilePlayerWallFeedback.transform.position = position;
+            projectilePlayerWallFeedback.PlayFeedbacks();
         }
     }
 }
